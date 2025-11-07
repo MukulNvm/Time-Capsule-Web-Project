@@ -1,44 +1,37 @@
-# Time Capsule
+# Time Capsule Web
 
-**Time Capsule** is an interactive mentorship and collaboration web application designed to connect learners with experienced professionals in technology. It provides users with features like mentorship discovery, profile creation, chat, and a responsive dashboard interface.
-
----
-
-## Project Overview
-
-This project was built using **React**, **TypeScript**, and **Vite** with a clean and modern UI.  
-It focuses on creating an intuitive user experience for coding mentorship, technology discussions, and personal development tracking.
+A secure web application that allows users to create **time-locked messages, images, or audio** that unlock on a chosen future date.  
+Designed and developed by **Mukul Saini**.
 
 ---
 
-## Tech Stack
+## 🧩 Overview
+
+**Time Capsule Web** lets users preserve personal or shared memories securely.  
+Messages remain encrypted and unlock automatically when the chosen time arrives.
+
+---
+
+## ⚙️ Features
+
+- Create time-locked messages with media (text, image, audio).  
+- Set a custom unlock date and recipient email.  
+- Encrypted storage and secure authentication.  
+- Automatic unlock and email delivery system.  
+- Responsive and modern user dashboard.
+
+---
+
+## 🛠️ Tech Stack
 
 - **Frontend:** React, TypeScript, Tailwind CSS, Vite  
-- **UI Components:** ShadCN/UI  
-- **Deployment:** Hostinger / GitHub Pages  
-- **Version Control:** Git and GitHub  
+- **Backend (optional):** Node.js / Express  
+- **Database:** PostgreSQL / Supabase  
+- **Tools:** Git, npm, VS Code  
 
 ---
 
-## Features
-
-- User Authentication (Login / Signup)  
-- Profile Creation and Management  
-- Mentor Listing with Filters  
-- Secure and Responsive Dashboard  
-- AI-assisted Mentor Recommendations (optional module)
-
----
-
-## Future Enhancements
-
-- Integration with a chat system for mentor-student communication  
-- AI-powered skill assessment tool  
-- Project collaboration boards  
-
----
-
-## Screenshots
+## 📸 Screenshots
 
 ![Login Page](./assets/loginpage.png)
 ![Dashboard](./assets/dashboard.png)
@@ -46,7 +39,7 @@ It focuses on creating an intuitive user experience for coding mentorship, techn
 
 ---
 
-## Author
+## 👨‍💻 Author
 
 **Mukul Saini**  
 BCA Data Science Student  
@@ -54,7 +47,6 @@ EA2431201010229
 
 ---
 
-## License
+**License:** MIT  
+© 2025 Mukul Saini. All rights reserved.
 
-This project is licensed under the [MIT License](./LICENSE) © 2025 Mukul Saini.  
-All code in this repository is written, customized, and maintained by Mukul Saini for educational and portfolio purposes.
