@@ -33,9 +33,9 @@ Messages remain encrypted and unlock automatically when the chosen time arrives.
 
 ## 📸 Screenshots
 
-![Login Page](./assets/loginpage.png)
-![Dashboard](./assets/dashboard.png)
-![Features](./assets/features.png)
+![Login Page](https://raw.githubusercontent.com/MukulNvm/Time-Capsule-Web-Project/main/assets/loginpage.png)
+![Dashboard](https://raw.githubusercontent.com/MukulNvm/Time-Capsule-Web-Project/main/assets/dashboard.png)
+![Features](https://raw.githubusercontent.com/MukulNvm/Time-Capsule-Web-Project/main/assets/features.png)
 
 ---
 
