@@ -25,55 +25,33 @@ const CreateCapsule = () => {
     setLoading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      if (!token || !userId) throw new Error("Not authenticated");
 
       // Create capsule
-      const { data: capsule, error: capsuleError } = await supabase
-        .from("capsules")
-        .insert({
-          owner_id: user.id,
+      const response = await fetch(`http://localhost:8080/api/capsules?userId=${userId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
           title,
-          message_encrypted: message,
-          unlock_at: new Date(unlockDate).toISOString(),
+          messageEncrypted: message,
+          unlockAt: new Date(unlockDate).toISOString(),
           privacy,
-          recipients: recipients ? recipients.split(",").map(e => e.trim()) : [],
-        })
-        .select()
-        .single();
+        }),
+      });
 
-      if (capsuleError) throw capsuleError;
-
-      // Upload files if any
-      if (files && files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          const filePath = `${user.id}/${capsule.id}/${file.name}`;
-
-          const { error: uploadError } = await supabase.storage
-            .from("capsule-files")
-            .upload(filePath, file);
-
-          if (uploadError) throw uploadError;
-
-          // Create file record
-          await supabase.from("files").insert({
-            capsule_id: capsule.id,
-            filename: file.name,
-            storage_path: filePath,
-            file_type: file.type,
-            checksum: "", // In production, calculate actual checksum
-            encrypted: true,
-          });
-        }
+      if (!response.ok) {
+        throw new Error("Failed to create capsule");
       }
 
-      // Create audit log
-      await supabase.from("audit_logs").insert({
-        capsule_id: capsule.id,
-        action: "created",
-        performed_by: user.id,
-      });
+      const capsule = await response.json();
+
+      // TODO: Handle file uploads if needed
+      // For now, skip file uploads as backend doesn't have file handling yet
 
       toast.success("Time capsule created successfully!");
       navigate("/dashboard");

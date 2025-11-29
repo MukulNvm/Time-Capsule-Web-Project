@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +8,14 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
 interface Capsule {
-  id: string;
+  id: number;
   title: string;
-  message_encrypted: string;
-  unlock_at: string;
+  messageEncrypted: string;
+  unlockAt: string;
   status: string;
   privacy: string;
-  created_at: string;
-  revealed_at: string | null;
+  createdAt: string;
+  revealedAt: string | null;
 }
 
 const Dashboard = () => {
@@ -27,34 +25,29 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setUser(session.user);
-        fetchCapsules();
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate("/auth");
-      } else {
-        setUser(session.user);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth");
+    } else {
+      fetchCapsules();
+    }
   }, [navigate]);
 
   const fetchCapsules = async () => {
     try {
-      const { data, error } = await supabase
-        .from("capsules")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(`http://localhost:8080/api/capsules?userId=${userId}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error("Failed to load capsules");
+      }
+
+      const data = await response.json();
       setCapsules(data || []);
     } catch (error: any) {
       toast.error("Failed to load capsules");
@@ -64,7 +57,8 @@ const Dashboard = () => {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     navigate("/auth");
   };
 
@@ -78,7 +72,7 @@ const Dashboard = () => {
   };
 
   const isUnlocked = (capsule: Capsule) => {
-    return capsule.status === "revealed" || new Date(capsule.unlock_at) <= new Date();
+    return capsule.status === "revealed" || new Date(capsule.unlockAt) <= new Date();
   };
 
   return (
@@ -146,7 +140,7 @@ const Dashboard = () => {
                     )}
                   </div>
                   <CardDescription className="line-clamp-2">
-                    {capsule.message_encrypted?.substring(0, 100)}
+                    {capsule.messageEncrypted?.substring(0, 100)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -154,7 +148,7 @@ const Dashboard = () => {
                     <div className="flex items-center gap-2 text-sm">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="text-muted-foreground">
-                        Unlocks {formatDistanceToNow(new Date(capsule.unlock_at), { addSuffix: true })}
+                        Unlocks {formatDistanceToNow(new Date(capsule.unlockAt), { addSuffix: true })}
                       </span>
                     </div>
                     <div className="flex gap-2">

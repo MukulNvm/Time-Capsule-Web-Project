@@ -21,15 +21,14 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface Capsule {
-  id: string;
+  id: number;
   title: string;
-  message_encrypted: string;
-  unlock_at: string;
+  messageEncrypted: string;
+  unlockAt: string;
   status: string;
   privacy: string;
-  recipients: any;
-  created_at: string;
-  revealed_at: string | null;
+  createdAt: string;
+  revealedAt: string | null;
 }
 
 interface CapsuleFile {
@@ -53,13 +52,18 @@ const CapsuleDetail = () => {
 
   const fetchCapsule = async () => {
     try {
-      const { data, error } = await supabase
-        .from("capsules")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/capsules/${id}`, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error("Failed to load capsule");
+      }
+
+      const data = await response.json();
       setCapsule(data);
     } catch (error: any) {
       toast.error("Failed to load capsule");
@@ -69,27 +73,24 @@ const CapsuleDetail = () => {
   };
 
   const fetchFiles = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("files")
-        .select("*")
-        .eq("capsule_id", id);
-
-      if (error) throw error;
-      setFiles(data || []);
-    } catch (error: any) {
-      console.error("Failed to load files", error);
-    }
+    // TODO: Implement file fetching from backend
+    // For now, no files
+    setFiles([]);
   };
 
   const handleDelete = async () => {
     try {
-      const { error } = await supabase
-        .from("capsules")
-        .delete()
-        .eq("id", id);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`http://localhost:8080/api/capsules/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error("Failed to delete capsule");
+      }
 
       toast.success("Capsule deleted successfully");
       navigate("/dashboard");
@@ -119,7 +120,7 @@ const CapsuleDetail = () => {
 
   const isUnlocked = () => {
     if (!capsule) return false;
-    return capsule.status === "revealed" || new Date(capsule.unlock_at) <= new Date();
+    return capsule.status === "revealed" || new Date(capsule.unlockAt) <= new Date();
   };
 
   if (loading) {
@@ -163,7 +164,7 @@ const CapsuleDetail = () => {
                   <CardTitle className="text-2xl">{capsule.title}</CardTitle>
                 </div>
                 <CardDescription>
-                  Created on {format(new Date(capsule.created_at), "PPP")}
+                  Created on {format(new Date(capsule.createdAt), "PPP")}
                 </CardDescription>
               </div>
               <AlertDialog>
@@ -209,13 +210,13 @@ const CapsuleDetail = () => {
               <h3 className="font-semibold mb-2">Message</h3>
               {isUnlocked() ? (
                 <p className="text-foreground whitespace-pre-wrap">
-                  {capsule.message_encrypted}
+                  {capsule.messageEncrypted}
                 </p>
               ) : (
                 <div className="bg-muted/50 p-6 rounded-lg text-center">
                   <Lock className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                   <p className="text-muted-foreground">
-                    This message is locked until {format(new Date(capsule.unlock_at), "PPP")}
+                    This message is locked until {format(new Date(capsule.unlockAt), "PPP")}
                   </p>
                 </div>
               )}
